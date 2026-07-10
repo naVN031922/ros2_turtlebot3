@@ -1,0 +1,72 @@
+
+=== UNIFIED STATION (camera sees + arm grasps, same spot) ===
+# Table: reach_table at x=-1.837, y=-0.5, top z=0.071
+# Block on table: center at z=0.086
+# GRASP POSE (gripper aligned on block): [0.0, 0.85, -0.6, 1.25]
+#   -> gripper at x=-1.839, z=0.098 (2mm from block center)
+# Camera sees block here: pixel (319,394), area 37094
+# Extended reach via straightened elbow (joint3=-0.6) + lifted wrist (joint4=1.25)
+# CONFIRMED: grip closes and holds block at unified station (grip position -0.006)
+# GENTLE LIFT (keeps gripper pointing down, block held): [0.0, 0.5, -0.3, 1.3]
+#   Key lesson: keep sum j2+j3+j4=1.5 during lift so gripper orientation stays down.
+#   A big pose jump (changing tilt) strips the block off - lift gently, same orientation.
+
+=== PLACE ON FLOOR BESIDE WHEEL (different location) ===
+# Carry sequence (block held, gripper stays down, sum j2+j3+j4=1.5 throughout):
+# 1. Lift high:        [0.4, 0.0, 0.2, 1.3]
+# 2. Rotate+extend:    [1.1, 0.7, -0.3, 1.1]   -> block past wheel, out clear
+# 3. Descend gently:   [1.1, 0.82, -0.02, 0.7] -> gripper z=0.043 (just above floor)
+# 4. Detach + open -> block placed on floor at (-1.987, -0.317), beside wheel
+# Bisection tuning found joint2=0.82 (0.7 too high, 0.95 into floor)
+
+=== TWO SEPARATE DROP SPOTS (verified empty-arm, clear of wheel/robot) ===
+# Both use: rotate high [j1, 0.0, 0.2, 1.3] then descend [j1, 0.82, -0.02, 0.7]
+# Spot A (GREEN): joint1=1.3 -> floor (-2.025, -0.302), z=0.043
+# Spot B (BLUE):  joint1=0.6 -> floor (-1.911, -0.384), z=0.043
+# Separation ~17cm - blocks won't interfere
+# GREEN pick pose (2-block table, aligned above green at y=-0.47): [0.13, 0.9, -0.85, 1.45]
+# CONFIRMED: picked GREEN from 2-block table, blue undisturbed (narrow gripper 0.004->close -0.006)
+# CONFIRMED: GREEN lifted clear, BLUE stayed on table - selective pick works!
+# CONFIRMED: GREEN full cycle done - picked from 2-block table, placed at Spot A floor, blue undisturbed
+# BLUE pick pose (2-block table, aligned above blue at y=-0.53): [-0.13, 0.82, -0.78, 1.46]
+
+=== GREEN: FULLY COMPLETED (do not redo) ===
+# Green picked from 2-block table (blue undisturbed), placed at Spot A floor (-2.025,-0.302)
+# Pick pose: [0.13, 0.9, -0.85, 1.45] -> lower [0.13,0.85,-0.6,1.25] -> grip -0.006 -> attach
+# Carry: lift [0.13,0,0.2,1.3] -> rotate high [1.3,0,0.2,1.3] -> descend [1.3,0.82,-0.02,0.7]
+#        -> extra descend [1.3,0.87,-0.04,0.67] z=0.034 -> detach -> open -> retreat
+
+=== BLUE: FULLY COMPLETED - two-block demo DONE ===
+# Blue picked from 2-block table (clean centered grip - check centering BEFORE closing!)
+# Pick: above [-0.13,0.82,-0.78,1.46] -> lower [-0.13,0.85,-0.6,1.25] -> grip -0.006 -> attach
+# Carry: lift [-0.13,0,0.2,1.3] -> rotate high [0.8,0,0.2,1.3]
+#        -> extend fwd [0.8,0.7,-0.6,1.4] (clears robot) -> descend [0.8,0.82,-0.02,0.7]
+#        -> extra descend [0.8,0.87,-0.04,0.67] z=0.035 -> detach -> open -> retreat
+# RESULT: green at Spot A (-2.025,-0.302), blue at its spot (-1.936,-0.352) - SEPARATE
+# KEY LESSON: verify grip centering before closing; extend arm forward to clear robot before descent
+
+=== FULL AUTONOMOUS DEMO VERIFIED (live, end-to-end) ===
+# Pipeline: camera -> apriltag_node -> /detections (tag 0, conf 94)
+#   -> apriltag_trigger.py -> /start_pick_and_place
+#   -> smooth_sequencer.py -> both blocks on table together, picked one-by-one,
+#      placed at SEPARATE spots (green Spot A, blue its spot), SMOOTH motions
+# Nodes needed: apriltag_node, apriltag_trigger.py, smooth_sequencer.py (+ Gazebo, grasp plugin)
+# Start order: apriltag_node -> smooth_sequencer -> apriltag_trigger (listeners before talkers)
+
+=== RUN-ONCE DESIGN VERIFIED (final) ===
+# Problem: tag left in view -> trigger re-fired every 10s -> demo looped.
+# Fix: apriltag_trigger_once.py - fires ONCE (one-shot guard), then deletes the tag.
+# Launch (full_demo.launch.py) starts detector+sequencer+trigger, NO tag at start.
+# Demo flow: system waits (armed, still) -> user spawns tag -> trigger fires once,
+#            removes tag -> sequencer runs ONE cycle -> stops. No repeat.
+# Spawn tag to start: ros2 run gazebo_ros spawn_entity.py -entity apriltag \
+#   -file /ws_slam/apriltag_marker/model.sdf -x -1.45 -y -0.5 -z 0.15
+
+=== FULLY-AUTOMATIC 2-COMMAND DEMO VERIFIED (final) ===
+# Tab 1: bash /ws_slam/start_gazebo.sh   (wait to settle)
+# Tab 2: ros2 launch /ws_slam/full_demo.launch.py
+# Launch auto-sequence: t=0 spawn table + start detector+sequencer;
+#   t=5s start run-once trigger; t=10s spawn tag -> trigger fires once,
+#   removes tag -> sequencer runs ONE two-block pick-place -> stops.
+# Nothing to type but the two commands. To control tag timing manually,
+#   remove the spawn_tag TimerAction and spawn the tag by hand.

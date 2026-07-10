@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="pillar">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision"><geometry><box><size>0.015 0.015 0.059</size></box></geometry></collision>
+      <visual name="visual">
+        <geometry><box><size>0.015 0.015 0.059</size></box></geometry>
+        <material><ambient>0.5 0.5 0.5 1</ambient><diffuse>0.5 0.5 0.5 1</diffuse></material>
+      </visual>
+    </link>
+  </model>
+</sdf>

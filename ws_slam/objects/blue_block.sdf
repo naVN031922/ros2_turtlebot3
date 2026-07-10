@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="blue_block">
+    <link name="link">
+      <inertial>
+        <mass>0.02</mass>
+        <inertia><ixx>0.000003</ixx><iyy>0.000003</iyy><izz>0.000003</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry><box><size>0.03 0.03 0.03</size></box></geometry>
+        <surface>
+          <friction><ode><mu>5.0</mu><mu2>5.0</mu2></ode></friction>
+          <contact><ode><kp>50000</kp><kd>10</kd><min_depth>0.002</min_depth><max_vel>0.005</max_vel></ode></contact>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>0.03 0.03 0.03</size></box></geometry>
+        <material><ambient>0 0 1 1</ambient><diffuse>0 0 1 1</diffuse></material>
+      </visual>
+    </link>
+  </model>
+</sdf>

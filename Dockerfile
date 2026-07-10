@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     lsb-release \
     gedit \
+    nano \
     unzip \
     gnupg2
 
@@ -129,7 +130,13 @@ RUN apt-get update && apt-get install -y ros-humble-ur-client-library \
                    ros-humble-slam-toolbox \
                    ros-humble-turtlebot3 \
                    ros-humble-turtlebot3-simulations \
-                   ros-humble-ament-clang-tidy
+                   ros-humble-ros2-control \
+                   ros-humble-ros2-controllers \
+                   ros-humble-gripper-controllers \
+                   ros-humble-xacro \
+                   ros-humble-ament-clang-tidy \
+                   ros-humble-apriltag \
+                   ros-humble-apriltag-ros
     
 # Initialize rosdep
 RUN rosdep init && rosdep update

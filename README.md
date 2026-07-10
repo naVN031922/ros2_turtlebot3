@@ -1,48 +1,48 @@
-## Docker Scripts for TurtleBot3 SLAM (ROS 2 Humble)
+# AprilTag-Triggered Pick-and-Place with OpenMANIPULATOR-X on TurtleBot3
 
-This repository contains Docker scripts to simplify the setup and execution of a SLAM development environment for TurtleBot3 using **ROS 2 Humble**.
-The goal is to create a learning environment for THD robotics team students to explore, practice, and understand SLAM concepts.
+**Author:** Naveen Kurakula (12504369)
+Deggendorf Institute of Technology, Campus Cham
 
-Installation and Usage
+This project implements an autonomous, AprilTag-triggered fixed pick-and-place
+system for the TurtleBot3 Waffle Pi with an OpenMANIPULATOR-X arm, in ROS 2
+(Humble) and Gazebo Classic. On detecting an AprilTag, the arm selectively
+picks two colored blocks from a table and places them at two separate floor
+locations, with a custom grasp plugin, color detection, and smooth motion.
 
-These scripts automate Docker installation, image building, and container execution.
+## My work (files I created)
 
+Located under `ws_slam/`:
 
+- `src/gazebo_grasp_plugin/` — **custom C++ Gazebo grasp plugin** (rigid grasp via a fixed joint)
+- `smooth_sequencer.py` — two-block selective pick-and-place with smooth multi-waypoint motion
+- `full_demo.launch.py` — single-command launch of the whole demo (table + nodes + tag)
+- `apriltag_trigger_once.py` / `apriltag_trigger_keep.py` / `apriltag_trigger_gated.py` — AprilTag trigger nodes
+- `detection_gate.py` — perception gate (detect-then-act)
+- `order_planner.py`, `final_sequencer.py`, `two_block_sequencer.py`, `pick_sequencer.py` — sequencing logic
+- `objects/color_pose_detector.py` — OpenCV HSV color detection publishing 3D TF frames
+- `objects/` — block, table, and platform models (SDF)
+- `apriltag_config/`, `apriltag_marker/` — AprilTag detector config and marker model
+- `worlds/grasp_world.world` — Gazebo world with the grasp plugin loaded
+- `DEMO_PICK_PLACE.txt` — recorded verified poses and notes
+- `start_gazebo.sh`, `start_demo.sh`, `spawn_blocks.sh` — helper scripts
 
-##: It is recommended to use the `-n` flag to enable Nvidia GPU support (if available).
+## How to run
 
-```bash
-bash install_docker.sh -n       # (Re)install Docker with Nvidia support
-bash build_docker.sh -n         # Build the Docker image
-bash run_docker.sh -n           # Run the Docker container
-bash into_docker.sh             # Access the running Docker container##
+1. Start the simulation: `bash start_gazebo.sh` (wait for Gazebo to settle).
+2. In another sourced terminal: `ros2 launch /ws_slam/full_demo.launch.py`
 
-## Based On
-Official TurtleBot3 SLAM documentation:
-https://emanual.robotis.com/docs/en/platform/turtlebot3/slam/
+The launch spawns the table, starts the detector, sequencer, and trigger, then
+spawns the AprilTag, which triggers a single two-block pick-and-place.
 
-SLAM Toolbox repository (Humble branch):
-https://github.com/SteveMacenski/slam_toolbox/tree/humble
+## Base packages used (standard dependencies, not my work)
 
-## Included Packages (from source)
-Inside the container workspace (./ws_slam/src), the following packages are cloned from their official sources:
+This project builds on the following open-source ROS 2 packages, which are
+cloned into `ws_slam/src/` during setup (excluded from this repository):
 
-turtlebot3_simulations
+- turtlebot3, turtlebot3_msgs, turtlebot3_simulations, turtlebot3_manipulation (ROBOTIS)
+- DynamixelSDK (ROBOTIS)
+- pymoveit2
+- gazebo-pkgs, general-message-pkgs
 
-DynamixelSDK
-
-turtlebot3_msgs
-
-turtlebot3
-
-after building and running the image, it is necessary to build the work space (ws_slam)
-comand:  colcon build
-and then source
-comand: source ws_slam/installation/setup.bash
-
-
-## Notes
-This setup is intended for simulation and SLAM testing in ROS 2 Humble.
-
-Modify the scripts as needed to adapt to your GPU, host system, or workspace preferences.
-
+These are dependencies of the project; my contribution is the code listed under
+"My work" above.

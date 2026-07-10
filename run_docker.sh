@@ -13,7 +13,7 @@ if [[ $1 = "--nvidia" ]] || [[ $1 = "-n" ]]
                 -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" \
                 -e XAUTHORITY \
                 -v /dev:/dev \
-               --mount source=ws_slam,target=/ws_slam \
+                -v /home/navn0319/ros2_turtlebot3/ws_slam:/ws_slam \
                --net=host \
                --privileged \
                --name slamn1 slamn1-img
@@ -70,7 +70,7 @@ fi
 #        -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
 #        -v $XAUTHORITY:$XAUTHORITY \
 #        --device=/dev/dri \
-#        -v $ROOT_DIR/ws_slam:/ws_slam \
+#        -v /home/navn0319/ros2_turtlebot3/ws_slam:/ws_slam \
 #        --net=host \
 #        --privileged \
 #        --name slamn1 slamn1-img
