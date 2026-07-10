@@ -1,4 +1,4 @@
-# AprilTag-Triggered Pick-and-Place with OpenMANIPULATOR-X on TurtleBot3
+# Selective Multi-Object Pick-and-Place on TurtleBot3 with OpenMANIPULATOR-X Triggered by AprilTag Detection
 
 **Author:** Naveen Kurakula (12504369)
 Deggendorf Institute of Technology, Campus Cham
